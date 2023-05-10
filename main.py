@@ -1,8 +1,9 @@
 from datetime import datetime
 import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
-from secret import access_token
-from Interface import BotInterface
+from secret import access_token, token_bot
+from BD_bot import add_users, add_user_viewed, drop_table
+
 
 class VkTools():
     def __init__(self, access_token):
@@ -98,7 +99,7 @@ class VkTools():
 
         res = []
 
-
+        attachment = ''
         for photo in photos:
             res.append({'owner_id': photo['owner_id'],
                         'id': photo['id'],
@@ -110,7 +111,14 @@ class VkTools():
 
         res.sort(key=lambda x: x['likes'] + x['comments'] * 10, reverse=True)
 
-        return res
+        attachment += ','.join(f'photo{photo["owner_id"]}_{photo["id"]}' for photo in photos[:3])
+
+
+
+        return attachment
+
+
+
 
 
 

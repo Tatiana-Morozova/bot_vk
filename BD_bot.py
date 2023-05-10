@@ -1,6 +1,6 @@
 from secret import db_url_object
 import psycopg2
-from main import *
+
 
 conn = psycopg2.connect(
     user='postgres',
@@ -17,7 +17,7 @@ def create_db():
 
         cur.execute("""create table IF NOT exists users (
                         profile_id int,
-                        worksheet_id int  unique);
+                        worksheet_id int);
                         """)
         conn.commit()
         cur.execute(""" SELECT worksheet_id FROM users;""")

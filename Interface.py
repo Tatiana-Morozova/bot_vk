@@ -1,9 +1,7 @@
 import vk_api
 from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.utils import get_random_id
-from BD_bot import *
-from secret import token_bot, access_token
-
+from main import *
 
 
 class BotInterface():
@@ -40,39 +38,22 @@ class BotInterface():
                     user = users.pop()
 
                     photos_user = self.api.get_photos(user['id_vk'])
-                    attachment = ''
-                    for num, photo in enumerate(photos_user):
-                        attachment += f'photo{photo["owner_id"]}_{photo["id"]},' \
-                                      f'photo{photo["owner_id"]}_{photo["id"]},' \
-                                      f'photo{photo["owner_id"]}_{photo["id"]}'
-                        if num == 2:
-                            break
-                        self.message_send(event.user_id,
+                    self.message_send(event.user_id,
                                         f'Встречайте {user["name"]}  {user["screen_name"]}',
-                                        attachment=attachment
+                                        photos_user
                                           )
                     add_user_viewed(user['id_vk'])
 
                     self.message_send(event.user_id, f'Продолжать поиск да/нет')
 
                 elif command == "да":
-                    user_info = self.api.get_profile_info(event.user_id)
                     user = users.pop()
-                    add_user_viewed(user['id_vk'])
-
                     photos_user = self.api.get_photos(user['id_vk'])
-                    attachment = ''
-                    for num, photo in enumerate(photos_user):
-                        attachment += f'photo{photo["owner_id"]}_{photo["id"]},' \
-                                      f'photo{photo["owner_id"]}_{photo["id"]},' \
-                                      f'photo{photo["owner_id"]}_{photo["id"]}'
-                        if num == 2:
-                            break
-                        self.message_send(event.user_id,
-                                          f'Встречайте {user["name"]}  {user["screen_name"]}',
-                                          attachment = attachment
+                    self.message_send(event.user_id,
+                                        f'Встречайте {user["name"]}  {user["screen_name"]}',
+                                      photos_user
                                           )
-                        self.message_send(event.user_id, f'Продолжать поиск да/нет')
+                    self.message_send(event.user_id, f'Продолжать поиск да/нет')
                 elif command == 'нет':
                     self.message_send(event.user_id, 'пока')
                     drop_table()
