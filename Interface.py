@@ -3,7 +3,7 @@ from vk_api.longpoll import VkLongPoll, VkEventType
 from vk_api.utils import get_random_id
 from BD_bot import *
 from secret import token_bot, access_token
-from main import VkTools
+
 
 
 class BotInterface():
@@ -13,7 +13,7 @@ class BotInterface():
         self.api = VkTools(access_token)
 
 
-    def message_send(self, user_id, message, attachment=None):
+    def message_send(self, user_id, message, attachment = None):
         self.interface.method('messages.send',
                               {'user_id': user_id,
                                'message': message,
@@ -32,44 +32,58 @@ class BotInterface():
                 if command == 'привет':
                     self.params = self.api.get_profile_info(event.user_id)
                     self.message_send(event.user_id, 'здравствуй, для поиска введите команду (поиск)'  )
-                    #event.user_id = user_id
+
                 elif command == 'поиск':
+                    add_users(event.user_id)
                     user_info = self.api.get_profile_info(event.user_id)
                     users = self.api.serch_users(user_info)
                     user = users.pop()
-                    #user_id = user['id']
+
                     photos_user = self.api.get_photos(user['id_vk'])
                     attachment = ''
                     for num, photo in enumerate(photos_user):
-                        attachment += f'photo{photo["owner_id"]}_{photo["id"]}'
+                        attachment += f'photo{photo["owner_id"]}_{photo["id"]},' \
+                                      f'photo{photo["owner_id"]}_{photo["id"]},' \
+                                      f'photo{photo["owner_id"]}_{photo["id"]}'
                         if num == 2:
                             break
                         self.message_send(event.user_id,
-                                        f'Встречайте {user["name"]}',
+                                        f'Встречайте {user["name"]}  {user["screen_name"]}',
                                         attachment=attachment
                                           )
-                    #add_user_viewed(user_id)
+                    add_user_viewed(user['id_vk'])
 
                     self.message_send(event.user_id, f'Продолжать поиск да/нет')
 
                 elif command == "да":
-
                     user_info = self.api.get_profile_info(event.user_id)
-                    users = self.api.serch_users(user_info)
+                    user = users.pop()
+                    add_user_viewed(user['id_vk'])
+
                     photos_user = self.api.get_photos(user['id_vk'])
                     attachment = ''
                     for num, photo in enumerate(photos_user):
-                        attachment += f'photo{photo["owner_id"]}_{photo["id"]}'
+                        attachment += f'photo{photo["owner_id"]}_{photo["id"]},' \
+                                      f'photo{photo["owner_id"]}_{photo["id"]},' \
+                                      f'photo{photo["owner_id"]}_{photo["id"]}'
                         if num == 2:
                             break
                         self.message_send(event.user_id,
-                                          f'Встречайте {user["name"]}',
-                                          attachment=attachment
+                                          f'Встречайте {user["name"]}  {user["screen_name"]}',
+                                          attachment = attachment
                                           )
                         self.message_send(event.user_id, f'Продолжать поиск да/нет')
-                else:
+                elif command == 'нет':
                     self.message_send(event.user_id, 'пока')
+                    drop_table()
                     break
+                else:
+                    self.message_send(event.user_id, 'не понимаю вашу команду, начните заново')
+                    drop_table()
+                    break
+
+
+
 
 
 
